@@ -44,8 +44,8 @@ copy_file() {
 # Asks for password.
 sudo ls > /dev/null
 
-# installer NodeJS
-# installer Starship
+installer NodeJS
+installer Starship
 
 echo ""
 
@@ -69,7 +69,7 @@ fi
 cp -r packages/node_overloader ~/.npm/modules
 rm -rf packages
 
-# osascript scripts/set_iterm_preferences_path.scpt
+osascript scripts/set_iterm_preferences_path.scpt
 
 echo ""
 echo "Installation done."
