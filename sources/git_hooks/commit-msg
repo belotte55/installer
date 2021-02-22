@@ -1,0 +1,5 @@
+#!/bin/sh
+
+MESSAGE=`cat $1 | grep -vE '^\[[A-Z0-9-]*\] ?$'`
+
+echo "$MESSAGE" > $1

@@ -1,0 +1,13 @@
+# This is Git's per-user configuration file.
+[user]
+# Please adapt and uncomment the following lines:
+	name = Frank Bellotto
+	email = frank@monpetitgazon.com
+[core]
+	hooksPath = /Users/frank/.git/hooks
+[alias]
+	n = !git -c hooks.pre-commit.disabled=true
+	nn = !git -c hooks.pre-commit.eslint.disabled=true
+	update = !git stash && git checkout develop && git fetch --all && git rebase origin/develop && git stash apply
+[commit]
+	template = .git/.commit_msg.txt

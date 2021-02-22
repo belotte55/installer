@@ -1,0 +1,129 @@
+autoload -U colors && colors
+export PSEUDO='iBelotte'
+
+source ~/.colors
+
+HISTFILE=~/.histfile
+
+HISTSIZE=50000
+SAVEHIST=10000
+
+# History command configuration
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # add commands to HISTFILE in order of execution
+setopt share_history          # share command history data
+
+bindkey -e
+
+CUSTOM_PATH="/Users/$(whoami)/Documents/Programs"
+
+# PATH modifications
+PATH="$CUSTOM_PATH/Shell:$PATH"
+PATH="${HOME}/.npm/packages/bin:$PATH"
+
+# Aliases
+alias Shell="cd $CUSTOM_PATH/Shell"
+
+alias vi='vim'
+alias edit="open -a \"Visual Studio Code\""
+
+alias pi2ssh='ssh pi@frank42.fr'
+
+alias gs='clear && git status'
+alias gc='clear && git checkout'
+alias gb='clear && git branch'
+alias gr='clear && git restore --staged'
+alias glog='git log --oneline --decorate --graph'
+alias glog2="git log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all"
+
+alias src='source ~/.zshrc'
+
+alias grep='grep  --color=auto --exclude-dir={.bzr,CVS,.git,.hg,.svn}'
+
+alias de='docker exec -it'
+alias dce='docker-compose exec'
+
+alias mp='ssh -p50022 frank@frank42.fr'
+alias ocean='ssh -t root@37.187.73.102 LOGGED_USER=frank bash'
+
+npm config set prefix "${HOME}/.npm/packages"
+
+# Functions
+# Returns randoms strings.
+# Usage: rand [[length=32] [regex=a-zA-Z0-9|count=1]]
+function rand () {
+	length=$1
+	regex=$2
+	count=$3
+	if [[ "${regex}" =~ ^[0-9]*$ ]]; then
+		count=$regex
+		unset regex
+	fi
+	defaultRegex='a-zA-Z0-9'
+  cat /dev/urandom | env LC_CTYPE=C tr -dc "${${regex}:-${defaultRegex}}" | fold -w "${${length}:-32}" | head -n "${${count}:-  1}"
+}
+
+# Move files/directories to delete to /tmp/<random_string>.
+# Usage: rm file1 [file2 ...]
+function rm () {
+	ID=`rand 32`
+	mkdir /tmp/$ID
+	args=()
+
+	for arg in $@; do
+		if [[ ! "${arg}" =~ '^-' ]]; then
+			args+=($arg)
+		fi
+	done
+
+	mv $args /tmp/$ID
+	if [ ! $? = 0 ]; then
+		return
+	fi
+	echo "${cyan}Files moved to /tmp/${ID}${reset}."
+}
+
+function sb () {
+	if [ "$1" = "" ]; then
+		git branch
+		return
+	fi
+	branch=`git branch | grep $1 | sed 's/^*//g' | sed 's/ //g' | head -n1`
+	if [ "$branch" = "" ]; then
+		echo "no branch found"
+		return
+	fi
+
+	git checkout "$branch"
+}
+
+# Overload node with consoleOverload module.
+function node () {
+	clear
+	node -r ~/.npm/modules/node_overloader $@
+}
+
+# Decode JWT.
+function decodeJWT () {
+	curl --silent \
+			 --location \
+	     --request POST \
+			 --header 'Content-Type: application/json' \
+			 --data-raw "{
+				\"token\": \"$1\"
+			 }" \
+			 'https://us-central1-cloud-functions-293411.cloudfunctions.net/decodeJWT' \
+			 | json_pp
+}
+
+cd $PWD
+clear
+
+export STARSHIP_CONFIG=~/.starship.toml
+
+# Load Starship.
+eval "$(starship init zsh)"

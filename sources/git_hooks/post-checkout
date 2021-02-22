@@ -1,0 +1,6 @@
+#!/bin/sh
+
+ISSUE=`git rev-parse --abbrev-ref HEAD | sed 's/^[^/]*\///g' | cut -d'-' -f1,2`
+echo "" > .git/.commit_msg.txt
+echo "[${ISSUE}] " >> .git/.commit_msg.txt
+echo "[FIX] " >> .git/.commit_msg.txt

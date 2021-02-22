@@ -1,0 +1,33 @@
+# Utilisez un format personnalisé
+format = """
+$time $directory $cmd_duration
+\r"""
+
+# Attendez 10 millisecondes pour que starship vérifie les fichiers dans le répertoire de travail.
+scan_timeout = 10
+
+# Don't print a new line at the start of the prompt
+#add_newline = false
+
+# Replace the "❯" symbol in the prompt with "➜"
+[character]                            # The name of the module we are configuring is "character"
+success_symbol = "[>](bold green)"     # The "success_symbol" segment is being set to "➜" with the color "bold green"
+
+# Disable the package module, hiding it from the prompt completely
+[nodejs]
+disabled = true
+
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style)"
+truncation_symbol = '../'
+
+[cmd_duration]
+min_time = 0
+format = "[\\[$duration\\]](bold blue)"
+
+[status]
+disabled = false
+
+[time]
+disabled = false
+format = "[$time](bold red)"

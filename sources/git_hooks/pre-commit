@@ -1,0 +1,54 @@
+#!/bin/zsh
+
+DISABLED="$(git config --bool hooks.pre-commit.disabled)"
+ESLINT_DISABLED="$(git config --bool hooks.pre-commit.eslint.disabled)"
+
+if test "$DISABLED"; then
+	exit 0
+fi
+
+# Redirect output to stderr.
+exec 1>&2
+
+BLACK='\033[30m'
+RED='\033[31m'
+GREEN='\033[32m'
+YELLOW='\033[33m'
+BLUE='\033[34m'
+PURPLE='\033[35m'
+CYAN='\033[36m'
+WHITE='\033[37m'
+RESET='\e[0m'
+
+REGEXS=(
+	'console\.log(' "${BLUE}"
+	'console\.warn(' "${YELLOW}"
+	'// ' "${GREEN}"
+)
+IS_ERROR=false
+
+for FILE in $(git diff --diff-filter=d --name-only --cached | tr '\n' ' '); do
+	FILE_DISPLAYED=false
+	for REGEX COLOR in $REGEXS; do
+		if test $(git diff --cached "$FILE" | grep "\+.*$REGEX" | wc -l) != 0; then
+			if [[ $FILE_DISPLAYED != true ]]; then
+				echo "${RED}$FILE${RESET}:"
+				FILE_DISPLAYED=true
+			fi
+			echo -n "${COLOR}"
+			grep -ne "$REGEX" "$FILE" | sed 's/^/  /g'
+			IS_ERROR=true
+			echo -n "${RESET}"
+		fi
+	done
+done
+
+if test "$ESLINT_DISABLED"; then
+else
+	eslint `git diff --diff-filter=d --cached --name-only`
+fi
+
+if [[ $IS_ERROR = true || $? > 0 ]]; then
+	echo "\n${WHITE}Use \`git n commit\` to ignore this error.${RESET}"
+	exit 1
+fi
