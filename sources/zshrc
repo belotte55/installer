@@ -107,6 +107,14 @@ function node () {
 	node -r ~/.npm/modules/node_overloader $@
 }
 
+function ping () {
+	IP="$1"
+	if [[ "${IP}" = "" ]]; then
+		IP="8.8.8.8"
+	fi
+	/sbin/ping "${IP}"
+}
+
 # Decode JWT.
 function decodeJWT () {
 	curl --silent \
