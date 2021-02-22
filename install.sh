@@ -1,6 +1,8 @@
 #!/bin/zsh
 
-source ./sources/colors
+source ./sources/colors 2> /dev/null
+
+BASE_RAW_URL='https://raw.githubusercontent.com/belotte55/installer/master'
 
 # NodeJS
 install_nodejs() {
@@ -30,10 +32,14 @@ installer() {
     fi
 }
 
-copy_file() {
+install_config_file() {
     CURRENT_PROGRAM_TO_INSTALL="$2"
-    cp $2 $2.save
-    cp $1 $2
+    cp $2 $2.save || true
+    if [[ -f "$1" ]]; then
+        cp $1 $2
+    else
+        curl -s $BASE_RAW_URL/$1 > $2
+    fi
     if [[ $? -eq 0 ]]; then
         echo "[${GREEN}${BOLD}OK${RESET}] Installed ${BLUE}${CURRENT_PROGRAM_TO_INSTALL}${RESET}."
     else
@@ -54,14 +60,14 @@ mkdir -p ~/.git/hooks
 mkdir -p ~/.npm/modules
 mkdir -p ~/.npm/packages
 
-copy_file sources/zshrc ~/.zshrc
-copy_file sources/colors ~/.colors
-copy_file sources/gitconfig ~/.gitconfig
-copy_file sources/git_hooks/post-checkout ~/.git/hooks/post-checkout
-copy_file sources/git_hooks/pre-commit ~/.git/hooks/pre-commit
-copy_file sources/starship.toml ~/.starship.toml
-copy_file sources/eslintrc ~/.eslintrc
-copy_file sources/com.googlecode.iterm2.plist ~/.config/com.googlecode.iterm2.plist
+install_config_file sources/zshrc ~/.zshrc
+install_config_file sources/colors ~/.colors
+install_config_file sources/gitconfig ~/.gitconfig
+install_config_file sources/git_hooks/post-checkout ~/.git/hooks/post-checkout
+install_config_file sources/git_hooks/pre-commit ~/.git/hooks/pre-commit
+install_config_file sources/starship.toml ~/.starship.toml
+install_config_file sources/eslintrc ~/.eslintrc
+install_config_file sources/com.googlecode.iterm2.plist ~/.config/com.googlecode.iterm2.plist
 
 if [[ ! -d 'packages' ]]; then
     git clone --quiet git@github.com:belotte55/packages.git
