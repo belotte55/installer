@@ -34,7 +34,7 @@ installer() {
 
 install_config_file() {
     CURRENT_PROGRAM_TO_INSTALL="$2"
-    cp $2 $2.save || true
+    cp $2 $2.save 2> /dev/null
     if [[ -f "$1" ]]; then
         cp $1 $2
     else
