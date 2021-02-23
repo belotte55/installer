@@ -73,9 +73,16 @@ if [[ ! -d 'packages' ]]; then
     git clone --quiet git@github.com:belotte55/packages.git
 fi
 cp -r packages/node_overloader ~/.npm/modules
+(cd ~/.npm/modules/node_overloader && npm install)
 rm -rf packages
 
-osascript scripts/set_iterm_preferences_path.scpt
+if [[ -f 'scripts/set_iterm_preferences_path.scpt' ]]; then
+    osascript scripts/set_iterm_preferences_path.scpt
+else
+    install_config_file scripts/set_iterm_preferences_path.scpt .
+    osascript set_iterm_preferences_path.scpt
+    rm set_iterm_preferences_path.scpt
+fi
 
 echo ""
 echo "Installation done."
