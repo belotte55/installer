@@ -104,7 +104,7 @@ function sb () {
 # Overload node with consoleOverload module.
 function node () {
 	clear
-	node -r ~/.npm/modules/node_overloader $@
+	/usr/local/bin/node -r ~/.npm/modules/node_overloader $@
 }
 
 function ping () {
