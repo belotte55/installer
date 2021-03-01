@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+source ~/.colors
+
 DISABLED="$(git config --bool hooks.pre-commit.disabled)"
 ESLINT_DISABLED="$(git config --bool hooks.pre-commit.eslint.disabled)"
 
@@ -35,10 +37,19 @@ for FILE in $(git diff --diff-filter=d --name-only --cached | tr '\n' ' '); do
 				echo "${RED}$FILE${RESET}:"
 				FILE_DISPLAYED=true
 			fi
-			echo -n "${COLOR}"
-			grep -ne "$REGEX" "$FILE" | sed 's/^/  /g'
+
+			while IFS= read -r line; do
+				if [[ "${line}" =~ '^[0-9]+:\+' ]]; then
+					echo -n "${COLOR}"
+				elif [[ "${line}" =~ '^[0-9]+:-' ]]; then
+					echo -n "${COLOR}${DIM}"
+				else
+					echo -n "${DIM}"
+				fi
+				echo "$line"
+				echo -n "${RESET}"
+			done <<< $(git diff --cached "$FILE" | grep -ne "$REGEX")
 			IS_ERROR=true
-			echo -n "${RESET}"
 		fi
 	done
 done
